@@ -31,6 +31,20 @@ const ImagePreloader = (function () {
     }
   }
 
+  function keepImgFormat (imageStr) {
+    // 图片url 中有?，表示已处理过，或者类型不正确，不处理
+    if (!imageStr || imageStr.includes('?')) {
+      return imageStr;
+    }
+    const arr = imageStr.split('.');
+    const imgTypeArr = ['png', 'jpg', 'jpeg']; 
+    if (!imgTypeArr.includes(arr[arr.length - 1])) {
+      return imageStr
+    };
+    const formatConfig = `/format/${arr[arr.length - 1]}`;
+    return `${imageStr}?imageMogr2${formatConfig}`
+  };
+  
   function getAssetsPath(assetData, assetsPath, originalPath) {
     var path = '';
     if (assetData.e) {
@@ -46,7 +60,8 @@ const ImagePreloader = (function () {
       path += assetData.u ? assetData.u : '';
       path += assetData.p;
     }
-    return path;
+    return keepImgFormat(path);
+//     return path;
   }
 
   function testImageLoaded(img) {
@@ -85,16 +100,6 @@ const ImagePreloader = (function () {
     };
     return ob;
   }
-
-  function keepImgFormat (imageStr) {
-    // 图片url 中有?，表示已处理过，或者类型不正确，不处理
-    if (!imageStr || imageStr.includes('?')) {
-      return imageStr;
-    }
-    const arr = imageStr.split('.');
-    const formatConfig = `/format/${arr[arr.length - 1]}`;
-    return `${imageStr}?imageMogr2${formatConfig}`
-  };
   
   function createImgData(assetData) {
     var path = getAssetsPath(assetData, this.assetsPath, this.path);
@@ -105,7 +110,7 @@ const ImagePreloader = (function () {
       ob.img = proxyImage;
       this._imageLoaded();
     }.bind(this), false);
-    img.src = keepImgFormat(path);
+    img.src = path;
     var ob = {
       img: img,
       assetData: assetData,
