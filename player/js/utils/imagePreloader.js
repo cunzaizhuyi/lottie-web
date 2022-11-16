@@ -86,6 +86,16 @@ const ImagePreloader = (function () {
     return ob;
   }
 
+  function keepImgFormat (imageStr) {
+    // 图片url 中有?，表示已处理过，或者类型不正确，不处理
+    if (!imageStr || imageStr.includes('?')) {
+      return imageStr;
+    }
+    const arr = imageStr.split('.');
+    const formatConfig = `/format/${arr[arr.length - 1]}`;
+    return `${imageStr}?imageMogr2${formatConfig}`
+  };
+  
   function createImgData(assetData) {
     var path = getAssetsPath(assetData, this.assetsPath, this.path);
     var img = createTag('img');
@@ -95,7 +105,7 @@ const ImagePreloader = (function () {
       ob.img = proxyImage;
       this._imageLoaded();
     }.bind(this), false);
-    img.src = path;
+    img.src = keepImgFormat(path);
     var ob = {
       img: img,
       assetData: assetData,
